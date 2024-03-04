@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
 
 
 # Address Model
@@ -44,18 +42,18 @@ class CardDesign(models.Model):
  
 
 # Social Media Platform Name Model
-class SocialPlatform(models.Model):
+class Platform(models.Model):
     name = models.CharField(max_length=50, unique=True)  # Store platform name (e.g., "facebook", "linkedin")
     icon = models.ImageField(upload_to="social_media_icons/", blank=True, null=True)  # Optional icon for the platform
+
+    def __str__(self) -> str:
+        return self.name
 
 
 # Social Media Link Model
 class SocialLink(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
-    platform = models.CharField(max_length=50)  # Store platform name (e.g., "facebook", "linkedin")
+    platform = models.ForeignKey(Platform, on_delete=models.CASCADE)  # Reference the Platform model
     url = models.URLField(max_length=2000)  # Store the full URL for the user's profile
 
     class Meta:
