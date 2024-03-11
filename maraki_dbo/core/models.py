@@ -29,11 +29,8 @@ class Profile(models.Model):
 
     biography = models.TextField(max_length=500, blank=True)
     cv = models.FileField(upload_to="cvs/", blank=True)
-    
-    card_limit = models.PositiveIntegerField(default=100)
-    shareable_card_limit = models.PositiveIntegerField(default=50)
+
     card_type_limit = models.PositiveIntegerField(default=1)
-    
 
     def __str__(self):
         return self.user.username

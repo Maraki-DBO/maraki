@@ -2,8 +2,11 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from core.models import Profession
 
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 import uuid
+
+from core.models import Profile
 
 User = get_user_model()
 
@@ -49,13 +52,13 @@ class CardDesign(models.Model):
     layout = models.ForeignKey(Layout, on_delete=models.SET_NULL, null=True, blank=True, related_name="designs")
 
     def __str__(self):
-        return f"{self.card.owner.username}'s Card Design"
+        return f"{self.id} Card Design"
 
 
 # Card Model
 class Card(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    owner = models.ForeignKey(User, on_delete = models.CASCADE)
+    owner = models.ForeignKey(Profile, on_delete = models.CASCADE)
     name = models.CharField(max_length = 64, blank = True)
     company = models.CharField(max_length=255, blank=True)
     website = models.URLField(blank=True)  # Optional website URL
@@ -65,26 +68,50 @@ class Card(models.Model):
     
     design = models.OneToOneField(CardDesign, on_delete=models.SET_NULL, null=True, blank=True)  # Optional design details
     created_at = models.DateTimeField(auto_now_add=True)  # Card creation timestamp
-
+    card_type = models.CharField(max_length=50, null=True, blank=True)  # Add the card_type field
     # Sharing
     is_sharable = models.BooleanField(default=True)  # Control shareability
+
+    share_limit = models.PositiveIntegerField(default=100)
     shared_count = models.PositiveIntegerField(default=0)  # Track total shares
+
+    third_party_share_limit = models.PositiveIntegerField(default=50)
+    third_party_shared_count = models.PositiveIntegerField(default=0)
+
 
     def save(self, *args, **kwargs):
         # Check the number of existing card types for the user
         user_card_types = Card.objects.filter(owner=self.owner).values_list('card_type', flat=True).distinct()
-        if len(user_card_types) >= self.owner.profile.card_type_limit:
+        if len(user_card_types) >= self.owner.card_type_limit:
             raise ValidationError("You have reached the maximum limit for card types.")
 
         super().save(*args, **kwargs)
     def __str__(self):
-        return f"{self.owner.username}'s Card"
+        return f"{self.owner}'s Card"
 
 
 class CardShare(models.Model):
     card = models.ForeignKey(Card, on_delete=models.CASCADE)
     shared_through = models.CharField(max_length=50, choices=[('email', 'Email'), ('qr_code', 'QR Code'), ('other', 'Other')], default='other')  # Sharing method
     shared_at = models.DateTimeField(auto_now_add=True)  # Timestamp of sharing
+    shared_with = models.ForeignKey(User, on_delete=models.CASCADE)  # User being shared with
+
+    def save(self, *args, **kwargs):
+        if self.card.owner == self.shared_with:
+            if self.card.shared_count >= self.card.share_limit:
+                raise ValidationError("You have reached the maximum share limit for this card.")
+
+            super().save(*args, **kwargs)
+            self.card.shared_count += 1
+            self.card.save()
+        else:
+            if self.card.third_party_shared_count >= self.card.third_party_share_limit:
+                raise ValidationError(f"The third-party share limit for {self.card.owner.user.get_username()}  has been reached.")
+
+            self.shared_at = timezone.now()
+            super().save(*args, **kwargs)
+            self.card.third_party_shared_count += 1
+            self.card.owner.save()
 
 class Sharing(models.Model):
     shared_from = models.ForeignKey(User, on_delete=models.CASCADE, related_name="shared_from")
@@ -94,7 +121,7 @@ class Sharing(models.Model):
     unique_identifier = models.UUIDField(default=uuid.uuid4, unique=True)  # Use UUIDField
 
     def __str__(self):
-        return f"{self.shared_from.username} shared {self.card} with {self.shared_to.username}"
+        return f"{self.shared_from.get_username()} shared {self.card} with {self.shared_to.get_username()}"
     
 class CardPopularity(models.Model):
     card = models.OneToOneField(Card, on_delete=models.CASCADE, primary_key=True)
