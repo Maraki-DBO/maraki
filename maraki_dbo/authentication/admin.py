@@ -1,4 +1,7 @@
 from django.contrib import admin
+# from django.contrib.auth.admin import UserAdmin
+# from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+# from .models import User
 
 # Register your models here.
 from . import models
@@ -26,3 +29,20 @@ for model in apps.get_models():
             admin.site.register(model, modelAdmin)
     except admin.sites.AlreadyRegistered:
         pass
+
+# class CustomUserCreationForm(UserCreationForm):
+#     class Meta:
+#         model = User
+#         fields = ('email', 'username')  # Include 'username' field
+
+# class CustomUserChangeForm(UserChangeForm):
+#     class Meta:
+#         model = User
+#         fields = ('email', 'username')  # Include 'username' field
+
+# class CustomUserAdmin(UserAdmin):
+#     add_form = CustomUserCreationForm
+#     form = CustomUserChangeForm
+#     model = User
+#     list_display = ('email', 'username', 'is_staff', 'is_superuser')
+# admin.site.register(models.User, CustomUserAdmin)

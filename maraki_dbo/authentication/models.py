@@ -13,9 +13,10 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(self, email, username, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault('username', username) 
 
         return self.create_user(email, password, **extra_fields)
 
@@ -43,9 +44,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     def __str__(self):
         return self.email
+    
+    def save(self, *args, **kwargs):
+        self.clean()  # Ensure data integrity
+        super().save(*args, **kwargs)
 
 class Profile(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE)

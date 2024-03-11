@@ -11,7 +11,10 @@ class MultiFieldModelBackend(ModelBackend):
                 Q(username=username) | Q(email=username) | Q(profile__phone_number=username)
             )
         except User.DoesNotExist:
-            return None
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                return None
 
         if user.check_password(password):
             return user
