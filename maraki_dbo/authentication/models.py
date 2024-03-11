@@ -53,7 +53,3 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.clean()  # Ensure data integrity
         super().save(*args, **kwargs)
 
-class Profile(models.Model):
-    user = models.ForeignKey(User, on_delete = models.CASCADE)
-    phone_number = models.CharField(max_length = 13)
-    
