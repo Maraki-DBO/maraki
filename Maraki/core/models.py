@@ -28,7 +28,7 @@ class User(AbstractUser):
     card_limit = models.PositiveIntegerField(default=100)  # Total card limit
     shareable_card_limit = models.PositiveIntegerField(default=50)  # Shareable card limit
 
-    bio = models.TextField(max_length=500, blank=True)  # Optional user bio
+    biography = models.TextField(max_length=500, blank=True)  # Optional user bio
     cv = models.FileField(upload_to="cvs/", blank=True)  # Optional CV upload
 
 
