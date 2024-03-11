@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Custom apps
-    'authentication',
+    'authentication.apps.AuthenticationConfig',
 ]
 
 MIDDLEWARE = [
@@ -53,11 +53,13 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'auth.backends.MultiFieldModelBackend',
+
+    'authentication.backends.MultiFieldModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
     # other backends
 ]
 
-AUTH_USER_MODEL = 'auth.User'
+AUTH_USER_MODEL = 'authentication.User'
 
 ROOT_URLCONF = 'maraki_dbo.urls'
 
