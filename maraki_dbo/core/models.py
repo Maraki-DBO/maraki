@@ -13,13 +13,22 @@ class Address(models.Model):
     postal_code = models.CharField(max_length = 20, blank = True)
     country = models.CharField(max_length = 100)
 
+    def __str__(self) -> str:
+        return self.street_address
+
 # Title Model
     
 class Title(models.Model):
     title = models.CharField(max_length = 12, unique = True)
 
+    def __str__(self) -> str:
+        return self.title
+
 class EducationLevel(models.Model):
     title = models.CharField(max_length = 255, unique = True)
+
+    def __str__(self) -> str:
+        return self.title
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -33,12 +42,15 @@ class Profile(models.Model):
     card_type_limit = models.PositiveIntegerField(default=1)
 
     def __str__(self):
-        return self.user.username
+        return self.user.get_username()
     
 
 # Profession Model
 class Profession(models.Model):
     name = models.CharField(max_length=255, unique=True)
     icon = models.ImageField(upload_to="profession_icons/", blank=True, null=True)
+
+    def __str__(self) -> str:
+        return self.name
 
 

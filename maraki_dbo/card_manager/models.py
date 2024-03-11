@@ -82,7 +82,7 @@ class Card(models.Model):
     def save(self, *args, **kwargs):
         # Check the number of existing card types for the user
         user_card_types = Card.objects.filter(owner=self.owner).values_list('card_type', flat=True).distinct()
-        if len(user_card_types) >= self.owner.card_type_limit:
+        if len(user_card_types) > self.owner.card_type_limit:
             raise ValidationError("You have reached the maximum limit for card types.")
 
         super().save(*args, **kwargs)
