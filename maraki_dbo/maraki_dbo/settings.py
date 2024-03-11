@@ -49,9 +49,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'maraki_dbo.urls'
+AUTHENTICATION_BACKENDS = [
+    'auth.backends.MultiFieldModelBackend',
+    # other backends
+]
 
 AUTH_USER_MODEL = 'auth.User'
+
+ROOT_URLCONF = 'maraki_dbo.urls'
+
 
 TEMPLATES = [
     {
