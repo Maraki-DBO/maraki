@@ -26,10 +26,14 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=13, blank=True)
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, blank=True, null=True)
     title = models.ForeignKey(EducationLevel, on_delete=models.SET_NULL, blank=True, null=True)
-    card_limit = models.PositiveIntegerField(default=100)
-    shareable_card_limit = models.PositiveIntegerField(default=50)
+
     biography = models.TextField(max_length=500, blank=True)
     cv = models.FileField(upload_to="cvs/", blank=True)
+    
+    card_limit = models.PositiveIntegerField(default=100)
+    shareable_card_limit = models.PositiveIntegerField(default=50)
+    card_type_limit = models.PositiveIntegerField(default=1)
+    
 
     def __str__(self):
         return self.user.username

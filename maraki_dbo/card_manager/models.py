@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from core.models import Profession
 
+from django.core.exceptions import ValidationError
 import uuid
 
 User = get_user_model()
@@ -69,9 +70,15 @@ class Card(models.Model):
     is_sharable = models.BooleanField(default=True)  # Control shareability
     shared_count = models.PositiveIntegerField(default=0)  # Track total shares
 
-    def __str__(self):
-        return f"{self.owner.username}'s Card"  
+    def save(self, *args, **kwargs):
+        # Check the number of existing card types for the user
+        user_card_types = Card.objects.filter(owner=self.owner).values_list('card_type', flat=True).distinct()
+        if len(user_card_types) >= self.owner.profile.card_type_limit:
+            raise ValidationError("You have reached the maximum limit for card types.")
 
+        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"{self.owner.username}'s Card"
 
 
 class CardShare(models.Model):
