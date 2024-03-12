@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # Custom apps
     'authentication.apps.AuthenticationConfig',
     'core.apps.CoreConfig',
+    'card_manager.apps.CardManagerConfig',
 ]
 
 MIDDLEWARE = [

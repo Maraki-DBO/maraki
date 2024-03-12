@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-import uuid
-
 # Create your models here.
 
 User = get_user_model()
@@ -15,31 +13,44 @@ class Address(models.Model):
     postal_code = models.CharField(max_length = 20, blank = True)
     country = models.CharField(max_length = 100)
 
+    def __str__(self) -> str:
+        return self.street_address
+
 # Title Model
     
 class Title(models.Model):
     title = models.CharField(max_length = 12, unique = True)
 
+    def __str__(self) -> str:
+        return self.title
+
 class EducationLevel(models.Model):
     title = models.CharField(max_length = 255, unique = True)
+
+    def __str__(self) -> str:
+        return self.title
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=13, blank=True)
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, blank=True, null=True)
     title = models.ForeignKey(EducationLevel, on_delete=models.SET_NULL, blank=True, null=True)
-    card_limit = models.PositiveIntegerField(default=100)
-    shareable_card_limit = models.PositiveIntegerField(default=50)
+
     biography = models.TextField(max_length=500, blank=True)
     cv = models.FileField(upload_to="cvs/", blank=True)
 
+    card_type_limit = models.PositiveIntegerField(default=1)
+
     def __str__(self):
-        return self.user.username
+        return self.user.get_username()
     
 
 # Profession Model
 class Profession(models.Model):
     name = models.CharField(max_length=255, unique=True)
     icon = models.ImageField(upload_to="profession_icons/", blank=True, null=True)
+
+    def __str__(self) -> str:
+        return self.name
 
 
