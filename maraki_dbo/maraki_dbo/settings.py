@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'card_manager.apps.CardManagerConfig',
 
     # 3rd party apps
-    'graphene-django',
+    'graphene_django',
 ]
 
 MIDDLEWARE = [
